@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+  <object-set>
+    <schema path="student_management">
+      <view name="虚拟视图_name" query="USE student_management; -- 确保在正确的数据库上下文中&#xa;&#xa;-- 学生完整信息视图&#xa;CREATE OR REPLACE VIEW vw_student_full_info AS&#xa;SELECT&#xa;    s.student_id AS &apos;学号&apos;,&#xa;    s.name AS &apos;姓名&apos;,&#xa;    g.gender_name AS &apos;性别&apos;,&#xa;    m.major_name AS &apos;专业&apos;,&#xa;    cl.class_name AS &apos;班级&apos;,&#xa;    m.department AS &apos;院系&apos;,&#xa;    cl.grade_year AS &apos;年级&apos;,&#xa;    s.enrollment_date AS &apos;入学日期&apos;,&#xa;    s.date_of_birth AS &apos;出生日期&apos;,&#xa;    s.contact_phone AS &apos;联系电话&apos;,&#xa;    s.email AS &apos;电子邮箱&apos;,&#xa;    s.created_at AS &apos;录入时间&apos;,&#xa;    s.updated_at AS &apos;最后修改时间&apos;&#xa;FROM&#xa;    students s&#xa;        JOIN&#xa;    genders g ON s.gender_id = g.gender_id&#xa;        JOIN&#xa;    majors m ON s.major_id = m.major_id&#xa;        JOIN&#xa;    classes cl ON s.class_id = cl.class_id&#xa;&#xa;SELECT &apos;View vw_student_full_info created or replaced.&apos; as_status;"/>
+    </schema>
+  </object-set>
+</data>
