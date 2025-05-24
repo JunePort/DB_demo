@@ -1,74 +1,97 @@
 package com.mybatisplus.controller;
 
-import java.util.List;
 import com.mybatisplus.entity.roles;
 import com.mybatisplus.mapper.M_roles;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/Role")
 public class C_roles {
-    final M_roles m_roles;
+    private static final Logger logger = LoggerFactory.getLogger(C_roles.class);
+    private final M_roles m_roles;
+
     public C_roles(M_roles m_roles) {
         this.m_roles = m_roles;
     }
 
-    // 新增角色（自增ID无需传参）
-    @RequestMapping("/R_insert")
-    public String insert(
-            @RequestParam("role_id") int roleId,
-            @RequestParam("role_name") String roleName,
-            @RequestParam("description") String description) {
+    // 插入角色
+    @PostMapping("/insert")
+    public String insertRole(
+            @RequestParam String role_name,
+            @RequestParam(required = false) String description) {
+        if (role_name == null || role_name.trim().isEmpty()) {
+            return "role_name 不能为空";
+        }
         try {
-            roles newRole = new roles(roleId, roleName, description);
-            boolean result = m_roles.insert(newRole) > 0;
-            return result ? "角色创建成功!" : "操作失败";
+            roles role = new roles();
+            role.setRoleName(role_name);
+            if (description != null) {
+                role.setDescription(description);
+            }
+            boolean result = m_roles.insert(role) > 0;
+            return result ? "创建成功!" : "创建失败!";
         } catch (Exception e) {
-            return "错误: " + e.getMessage();
+            logger.error("创建角色异常", e);
+            return "error: " + e.getMessage();
         }
     }
 
     // 删除角色
-    @RequestMapping("/R_delete")
-    public String delete(
-            @RequestParam("role_id") int roleId) {
+    @GetMapping("/delete")
+    public String deleteRole(@RequestParam int role_id) {
+        if (role_id <= 0) {
+            return "ID 必须大于 0";
+        }
         try {
-            boolean result = m_roles.deleteById(roleId) > 0;
-            return result ? "角色已删除" : "角色ID不存在";
+            boolean result = m_roles.deleteById(role_id) > 0;
+            return result ? "删除成功" : "ID不存在";
         } catch (Exception e) {
-            return "错误: " + e.getMessage();
+            logger.error("删除角色异常", e);
+            return "error: " + e.getMessage();
         }
     }
 
-    // 更新角色信息
-    @RequestMapping("/R_update")
-    public String update(
-            @RequestParam("role_id") int roleId,
-            @RequestParam(value = "role_name", required = false) String roleName,
-            @RequestParam(value = "description", required = false) String description) {
+    // 更新角色
+    @PostMapping("/update")
+    public String updateRole(
+            @RequestParam int role_id,
+            @RequestParam(required = false) String role_name,
+            @RequestParam(required = false) String description) {
+        if (role_id <= 0) {
+            return "ID 必须大于 0";
+        }
         try {
-            roles existRole = m_roles.selectById(roleId);
-            if (existRole == null) return "角色不存在";
-            if (roleName != null) existRole.setRoleName(roleName);
-            if (description != null) existRole.setDescription(description);
+            roles existRole = m_roles.selectById(role_id);
+            if (existRole == null) return "ID不存在";
+
+            if (role_name != null) {
+                existRole.setRoleName(role_name);
+            }
+            if (description != null) {
+                existRole.setDescription(description);
+            }
             int affected = m_roles.updateById(existRole);
-            return affected > 0 ? "更新成功" : "无变更";
+            return affected > 0 ? "更新成功" : "更新失败";
         } catch (Exception e) {
-            return "错误: " + e.getMessage();
+            logger.error("更新角色异常", e);
+            return "error: " + e.getMessage();
         }
     }
 
     // 查询所有角色
-    @RequestMapping("/R_select")
-    public List<roles> select() {
+    @GetMapping("/select")
+    public List<roles> selectAllRoles() {
         return m_roles.selectList(null);
     }
-}
 
-// http://localhost:8081/R_insert?role_name=管理员&description=系统管理员权限
-// http://localhost:8081/R_delete?role_id=5
-// http://localhost:8081/R_update?role_id=1&description=普通用户权限
-// http://localhost:8081/R_select
+    // 按ID查询角色
+    @GetMapping("/select_by_id")
+    public roles selectRoleById(@RequestParam int role_id) {
+        return m_roles.selectById(role_id);
+    }
+}

@@ -1,25 +1,46 @@
 package com.mybatisplus.entity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@TableName("users")
 public class users {
     @TableId(value = "user_id", type = IdType.AUTO)
-    private int userId;
+    private Integer userId;  // 自增主键
+
+
     private String username;
-    private String passwordHash;
-    private int roleId;
-    private String studentIdLink;
+
+
+    @TableField("password_hash")
+    private String passwordHash;  // BCrypt加密存储
+
+
+    @TableField("role_id")
+    private Integer roleId;
+
+
+    @TableField("student_id_link")
+    private String studentIdLink;  // 关联学生ID
+
+
+    @TableField("full_name")
     private String fullName;
-    private int isActive;
-    private Date createdAt;
-    private Date updatedAt;
+
+
+    private String email;
+
+    @TableField("is_active")
+    private Boolean isActive = true;  // 默认激活状态
+
+    @TableField(value = "created_at", fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
+
+    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
+
+
 }
