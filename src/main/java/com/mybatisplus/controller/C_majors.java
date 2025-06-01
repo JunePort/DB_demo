@@ -23,43 +23,36 @@ public class C_majors {
     public String insert(
             @RequestParam("major_code") String majorCode,
             @RequestParam("major_name") String majorName,
-            @RequestParam(value = "default_program_duration", required = false) Integer defaultProgramDuration,
-            @RequestParam(value = "default_education_level_id", required = false) Integer defaultEducationLevelId) {
+            @RequestParam("default_program_duration") int defaultProgramDuration,
+            @RequestParam("default_education_level_id") int defaultEducationLevelId) {
         if (majorCode == null || majorCode.trim().isEmpty()) {
             return "major_code 不能为空";
-        }
-        if (majorCode.length() != 2) {
-            return "专业代码必须是2位字符";
         }
         if (majorName == null || majorName.trim().isEmpty()) {
             return "major_name 不能为空";
         }
-        if (defaultProgramDuration != null && defaultProgramDuration <= 0) {
+        if (defaultProgramDuration <= 0) {
             return "default_program_duration 必须大于 0";
         }
-        if (defaultEducationLevelId != null && defaultEducationLevelId <= 0) {
+        if (defaultEducationLevelId <= 0) {
             return "default_education_level_id 必须大于 0";
         }
         try {
             majors newMajor = new majors();
             newMajor.setMajorCode(majorCode);
             newMajor.setMajorName(majorName);
-            if (defaultProgramDuration != null) {
-                newMajor.setDefaultProgramDuration(defaultProgramDuration);
-            }
-            if (defaultEducationLevelId != null) {
-                newMajor.setDefaultEducationLevelId(defaultEducationLevelId);
-            }
+            newMajor.setDefaultProgramDuration(defaultProgramDuration);
+            newMajor.setDefaultEducationLevelId(defaultEducationLevelId);
             boolean result = m_majors.insert(newMajor) > 0;
-            return result ? "插入成功!" : "插入失败!";
+            return result? "插入成功!" : "插入失败!";
         } catch (Exception e) {
             logger.error("插入操作出现异常", e);
             return "error: " + e.getMessage();
         }
     }
 
-    // 10.2 删除专业信息
-    @RequestMapping(value = "/Major_delete", method = {RequestMethod.GET, RequestMethod.DELETE})
+    // 删除方法
+    @RequestMapping("/majors_delete")
     public String delete(
             @RequestParam("major_id") int majorId) {
         if (majorId <= 0) {
@@ -67,15 +60,15 @@ public class C_majors {
         }
         try {
             boolean result = m_majors.deleteById(majorId) > 0;
-            return result ? "删除成功" : "ID不存在";
+            return result? "删除成功" : "ID不存在";
         } catch (Exception e) {
             logger.error("删除操作出现异常", e);
             return "error: " + e.getMessage();
         }
     }
 
-    // 10.3 更新专业信息
-    @RequestMapping(value = "/Major_update", method = {RequestMethod.GET, RequestMethod.PUT})
+    // 更新方法
+    @RequestMapping("/majors_update")
     public String update(
             @RequestParam("major_id") int majorId,
             @RequestParam(value = "major_code", required = false) String majorCode,
